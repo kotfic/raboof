@@ -1,3 +1,4 @@
 from proj import tasks
 
-tasks.task.delay('foobar')
+tasks.task.delay('reverse', 'foobar')
+tasks.task.delay('capitalize', 'foobar')

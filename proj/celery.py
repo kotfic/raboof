@@ -4,6 +4,7 @@ from celery import Celery
 from .serializer import serialize, deserialize
 from kombu.serialization import register, registry
 
+# Register the custom serializer with kombu
 register('reverse', serialize, deserialize,
          content_type='application/json',
          content_encoding='utf-8')
