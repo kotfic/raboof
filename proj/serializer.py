@@ -1,20 +1,23 @@
-import json
+import functools
+try:
+    from . import  transform
+except ImportError:
+    import transform
+
+from kombu.utils import json as _json
+
+def object_hook(obj):
+    try:
+        cls  = getattr(transform, obj['_class'])
+    except Exception:
+        return obj
+
+    return cls.__obj__(obj["__state__"])
 
 def serialize(obj):
-    return json.dumps(obj)
+    return _json.dumps(obj, check_circular=False)
 
 def deserialize(obj):
-    jsonObj = json.loads(obj)
-    # Transform second argument based on option specified by first agrument
-    option = jsonObj[0][0]
-    if option == 'reverse':
-        jsonObj[0][1] = reverseTransform(jsonObj[0][1])
-    elif option == 'capitalize':
-        jsonObj[0][1] = capitalizeTransform(jsonObj[0][1])
-
-    return jsonObj
-
-def reverseTransform(str):
-    return str[::-1]
-def capitalizeTransform(str):
-    return str.upper()
+    return _json.loads(
+        obj, _loads=functools.partial(
+            _json.json.loads, object_hook=object_hook))
